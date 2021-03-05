@@ -30,6 +30,7 @@ class TextFieldTags extends StatefulWidget {
         assert(onDelete != null && onTag != null,
             'onDelete and onTag should not be null'),
         super(key: key);
+
   @override
   _TextFieldTagsState createState() => _TextFieldTagsState();
 }
@@ -183,13 +184,41 @@ class _TextFieldTagsState extends State<TextFieldTags> {
         var lastLastTag =
             splitedTagsList[splitedTagsList.length - 2].trim().toLowerCase();
 
+        if (value == " ") {
+          if (widget.onDelete != null)
+            widget.onDelete(_tagsStringContent[_tagsStringContent.length - 1]);
+
+          if (_tagsStringContent.length == 1 && _showPrefixIcon) {
+            setState(() {
+              _tagsStringContent
+                  .remove(_tagsStringContent[_tagsStringContent.length - 1]);
+              _showPrefixIcon = false;
+            });
+          } else {
+            setState(() {
+              _tagsStringContent
+                  .remove(_tagsStringContent[_tagsStringContent.length - 1]);
+            });
+          }
+
+          if (_tagsStringContent.length == 0) {
+            _textEditingController.text = "";
+          } else {
+            _textEditingController.text = "  ";
+            _textEditingController.selection = TextSelection.fromPosition(
+                TextPosition(offset: _textEditingController.text.length));
+          }
+        }
+
         if (value.contains(" ")) {
           if (lastLastTag.length > 0) {
             _textEditingController.clear();
 
             if (!_tagsStringContent.contains(lastLastTag)) {
               widget.onTag(lastLastTag);
-
+              _textEditingController.text = "  ";
+              _textEditingController.selection = TextSelection.fromPosition(
+                  TextPosition(offset: _textEditingController.text.length));
               if (!_showPrefixIcon) {
                 setState(() {
                   _tagsStringContent.add(lastLastTag);
